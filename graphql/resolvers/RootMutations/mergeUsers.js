@@ -49,10 +49,10 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     await transaction.public.pledges.update(from, to)
     await transaction.public.memberships.update(from, to)
     await transaction.public.comments.update(from, to)
-    if (!transaction.public.testimonials.findFirst(to)) {
+    if (!(await transaction.public.testimonials.findFirst(to))) {
       await transaction.public.testimonials.update(from, to)
     }
-    if (!transaction.public.ballots.findFirst(to)) {
+    if (!await (transaction.public.ballots.findFirst(to))) {
       await transaction.public.ballots.update(from, to)
     }
 
@@ -75,7 +75,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     // remove old user
     await transaction.public.users.deleteOne({id: sourceUser.id})
 
-    // await transaction.transactionCommit()
+    await transaction.transactionCommit()
 
     try {
       unsubscribeFromMailchimp({
